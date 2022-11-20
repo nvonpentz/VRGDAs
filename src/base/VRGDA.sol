@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import {wadExp, wadLn, wadMul, unsafeWadMul, toWadUnsafe} from "solmate/utils/SignedWadMath.sol";
+import {toWadUnsafe, wadLn} from "solmate/utils/SignedWadMath.sol";
+import {VRGDA as LibVRGDA} from "../libs/VRGDA.sol";
 
 /// @title Variable Rate Gradual Dutch Auction
 /// @author transmissions11 <t11s@paradigm.xyz>
@@ -41,15 +42,16 @@ abstract contract VRGDA {
     /// @param sold The total number of tokens that have been sold so far.
     /// @return The price of a token according to VRGDA, scaled by 1e18.
     function getVRGDAPrice(int256 timeSinceStart, uint256 sold) public view virtual returns (uint256) {
-        unchecked {
-            // prettier-ignore
-            return uint256(wadMul(targetPrice, wadExp(unsafeWadMul(decayConstant,
+        return
+            LibVRGDA.getVRGDAPrice(
+                timeSinceStart,
+                targetPrice,
+                decayConstant,
                 // Theoretically calling toWadUnsafe with sold can silently overflow but under
                 // any reasonable circumstance it will never be large enough. We use sold + 1 as
                 // the VRGDA formula's n param represents the nth token and sold is the n-1th token.
-                timeSinceStart - getTargetSaleTime(toWadUnsafe(sold + 1))
-            ))));
-        }
+                getTargetSaleTime(toWadUnsafe(sold + 1))
+            );
     }
 
     /// @dev Given a number of tokens sold, return the target time that number of tokens should be sold by.

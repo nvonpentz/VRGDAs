@@ -1,16 +1,15 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 
-import {unsafeWadDiv} from "solmate/utils/SignedWadMath.sol";
-
-import {VRGDA} from "./VRGDA.sol";
+import {VRGDA} from "./base/VRGDA.sol";
+import {VRGDA as LibVRGDA} from "./libs/VRGDA.sol";
 import {LogisticVRGDA} from "./LogisticVRGDA.sol";
 
 /// @title Logistic To Linear Variable Rate Gradual Dutch Auction
 /// @author transmissions11 <t11s@paradigm.xyz>
 /// @author FrankieIsLost <frankie@paradigm.xyz>
 /// @notice VRGDA with a piecewise logistic and linear issuance curve.
-abstract contract LogisticToLinearVRGDA is LogisticVRGDA {
+contract LogisticToLinearVRGDA is LogisticVRGDA {
     /*//////////////////////////////////////////////////////////////
                            PRICING PARAMETERS
     //////////////////////////////////////////////////////////////*/
@@ -65,7 +64,7 @@ abstract contract LogisticToLinearVRGDA is LogisticVRGDA {
         if (sold < soldBySwitch) return LogisticVRGDA.getTargetSaleTime(sold);
 
         unchecked {
-            return unsafeWadDiv(sold - soldBySwitch, perTimeUnit) + switchTime;
+            return LibVRGDA.getTargetSaleTimeLinear(sold - soldBySwitch, perTimeUnit) + switchTime;
         }
     }
 }
