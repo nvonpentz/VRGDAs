@@ -15,7 +15,7 @@ library VRGDA {
         int256 targetPrice,
         int256 decayConstant,
         int256 targetSaleTime
-    ) public pure returns (uint256) {
+    ) internal pure returns (uint256) {
         unchecked {
             // prettier-ignore
             return uint256(wadMul(targetPrice, wadExp(unsafeWadMul(decayConstant,
@@ -29,7 +29,7 @@ library VRGDA {
     /// @param perTimeUnit The number of tokens to target selling in 1 full unit of time, scaled by 1e18.
     /// @return The target time the tokens should be sold by, scaled by 1e18, where the time is
     /// relative, such that 0 means the tokens should be sold immediately when the VRGDA begins.
-    function getTargetSaleTimeLinear(int256 sold, int256 perTimeUnit) public pure returns (int256) {
+    function getTargetSaleTimeLinear(int256 sold, int256 perTimeUnit) internal pure returns (int256) {
         return unsafeWadDiv(sold, perTimeUnit);
     }
 
@@ -43,7 +43,7 @@ library VRGDA {
         int256 sold,
         int256 logisticLimit,
         int256 timeScale
-    ) public pure returns (int256) {
+    ) internal pure returns (int256) {
         unchecked {
             return -unsafeWadDiv(wadLn(unsafeDiv(logisticLimit * 2e18, sold + logisticLimit) - 1e18), timeScale);
         }
